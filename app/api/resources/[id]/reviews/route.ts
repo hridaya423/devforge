@@ -1,9 +1,16 @@
 import { createServerClien } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
+type Props = {
+  params: {
+    id: string;
+  };
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string }}
+  props: Props
 ): Promise<NextResponse> {
   try {
     const supabase = createServerClien();
@@ -11,7 +18,7 @@ export async function GET(
     const { data, error } = await supabase
       .from('resource_reviews')
       .select('*')
-      .eq('resource_id', params.id)
+      .eq('resource_id', props.params.id)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -25,7 +32,7 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string }}
+  props: Props
 ): Promise<NextResponse> {
   try {
     const body = await request.json();
@@ -35,7 +42,7 @@ export async function POST(
       .from('resource_reviews')
       .insert([{
         ...body,
-        resource_id: params.id
+        resource_id: props.params.id
       }])
       .select()
       .single();
