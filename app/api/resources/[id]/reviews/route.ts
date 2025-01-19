@@ -1,16 +1,9 @@
 import { createServerClien } from '@/lib/supabase/server';
-import { type NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-interface Props {
-  params: {
-    id: string;
-  };
-}
-
 export async function GET(
-  _request: NextRequest,
-  props: Props
+  request: Request,
+  { params }: { params: { id: string } }
 ) {
   try {
     const supabase = createServerClien();
@@ -18,7 +11,7 @@ export async function GET(
     const { data, error } = await supabase
       .from('resource_reviews')
       .select('*')
-      .eq('resource_id', props.params.id)
+      .eq('resource_id', params.id)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -31,8 +24,8 @@ export async function GET(
 }
 
 export async function POST(
-  request: NextRequest,
-  props: Props
+  request: Request,
+  { params }: { params: { id: string } }
 ) {
   try {
     const body = await request.json();
@@ -42,7 +35,7 @@ export async function POST(
       .from('resource_reviews')
       .insert([{
         ...body,
-        resource_id: props.params.id
+        resource_id: params.id
       }])
       .select()
       .single();
