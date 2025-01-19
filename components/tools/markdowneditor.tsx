@@ -5,36 +5,116 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { ArrowLeft, Copy, Download, Upload, Save, Undo, Redo } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
-import DOMPurify from 'isomorphic-dompurify';
-import { marked } from 'marked';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { motion } from 'framer-motion';
 
-const getDefaultMarkdown = () => `# Welcome to the Enhanced Markdown Editor
+const getDefaultMarkdown = () => `# Welcome to the Simple Markdown Editor
 
 ## Features
-- **Live Preview** with GFM support
-- *Auto-save* functionality
-- Keyboard shortcuts (Ctrl/⌘ + S to save)
-- File upload/download
-- Undo/Redo support
-- Secure HTML rendering
-- Responsive design
+- **Bold text** and *italic text*
+- Basic code blocks
+- Links and images
+- Lists and quotes
 
 ### Example Code Block:
-\`\`\`javascript
+\`\`\`
 const greeting = "Hello, World!";
 console.log(greeting);
 \`\`\`
 
-> Try out different markdown features!
+> This is a blockquote
 
 1. First ordered list item
 2. Second item
    - Unordered sub-list
    - Another item
 
-Visit the [documentation](https://docs.example.com) for more details.`;
+[Visit our website](https://example.com)`;
+
+const parseMarkdown = (markdown: string): string => {
+  let html = markdown
+  html = html.replace(/[&<>"']/g, (match) => {
+    const entities: { [key: string]: string } = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    };
+    return entities[match];
+  });
+  html = html.replace(/\`\`\`([\s\S]*?)\`\`\`/g, '<pre><code>$1</code></pre>');
+  html = html.replace(/\`([^\`]+)\`/g, '<code>$1</code>');
+  html = html.replace(/^### (.*$)/gm, '<h3>$1</h3>');
+  html = html.replace(/^## (.*$)/gm, '<h2>$1</h2>');
+  html = html.replace(/^# (.*$)/gm, '<h1>$1</h1>');
+  html = html.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
+  html = html.replace(/^(\s*)-\s+(.+)$/gm, (match, indent, content) => {
+    const level = indent.length;
+    return `${'\t'.repeat(level)}<li>${content}</li>`;
+  });
+
+  html = html.replace(/^(\s*)\d+\.\s+(.+)$/gm, (match, indent, content) => {
+    const level = indent.length;
+    return `${'\t'.repeat(level)}<li>${content}</li>`;
+  });
+
+  const convertListHierarchy = (html: string): string => {
+    const lines = html.split('\n');
+    const stack: string[] = [];
+    let result = '';
+    let currentLevel = 0;
+
+    lines.forEach((line) => {
+      if (line.includes('<li>')) {
+        const level = (line.match(/^\t*/)?.[0] || '').length;
+        const content = line.replace(/^\t*/, '');
+        while (currentLevel > level) {
+          result += `</${stack.pop()}>\n`;
+          currentLevel--;
+        }
+        while (currentLevel < level) {
+          const listType = content.startsWith('<li>1.') ? 'ol' : 'ul';
+          stack.push(listType);
+          result += `<${listType}>\n`;
+          currentLevel++;
+        }
+
+        result += content + '\n';
+      } else {
+        while (currentLevel > 0) {
+          result += `</${stack.pop()}>\n`;
+          currentLevel--;
+        }
+        result += line + '\n';
+      }
+    });
+
+    while (stack.length > 0) {
+      result += `</${stack.pop()}>\n`;
+    }
+
+    return result;
+  };
+
+  html = convertListHierarchy(html);
+
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+
+  html = html.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+
+  html = html.replace(/!\[([^\]]+)\]\(([^\)]+)\)/g, (match, alt, src) => {
+    return `<img src="${src}" alt="${alt}" onerror="this.src='/api/placeholder/400/300';this.onerror=null;">`;
+  });
+
+  html = html.replace(/\n\n/g, '</p><p>');
+  html = '<p>' + html + '</p>';
+
+  html = html.replace(/<p>\s*<\/p>/g, '');
+
+  return html;
+};
 
 const MarkdownEditor = () => {
   const { toast } = useToast();
@@ -45,13 +125,9 @@ const MarkdownEditor = () => {
   const [lastSavedDisplay, setLastSavedDisplay] = useState('Not saved yet');
   const [renderedContent, setRenderedContent] = useState('');
 
-useEffect(() => {
-  const updateRenderedContent = async () => {
-    const rendered = await renderMarkdown(markdown);
-    setRenderedContent(rendered);
-  };
-  updateRenderedContent();
-}, [markdown]);
+  useEffect(() => {
+    setRenderedContent(parseMarkdown(markdown));
+  }, [markdown]);
 
   useEffect(() => {
     setIsClient(true);
@@ -159,17 +235,6 @@ useEffect(() => {
     });
   };
 
-  const renderMarkdown = async (text: string): Promise<string> => {
-    if (!isClient) return '';
-    try {
-      const rawHtml = await Promise.resolve(marked(text));
-      return DOMPurify.sanitize(rawHtml);
-    } catch (error) {
-      console.error('Error rendering markdown:', error);
-      return '';
-    }
-  };
-
   if (!isClient) return null;
 
   return (
@@ -198,7 +263,7 @@ useEffect(() => {
               <div className="flex justify-between items-center">
                 <div>
                   <CardTitle className="text-2xl bg-gradient-to-r from-orange-400 to-pink-500 bg-clip-text text-transparent">
-                    Markdown Editor
+                    Simple Markdown Editor
                   </CardTitle>
                   <CardDescription className="text-gray-400">
                     Create and preview Markdown documents with live formatting
@@ -279,20 +344,120 @@ useEffect(() => {
                   <textarea
                     value={markdown}
                     onChange={handleMarkdownChange}
-                    className="w-full h-full p-4 rounded-lg bg-gray-900/60 border-gray-800/50 focus:border-orange-500/50 text-gray-300 font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+                    className="w-full h-full p-4 rounded-lg bg-gray-900/60 border border-gray-800/50 focus:border-orange-500/50 text-gray-300 font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-orange-500/50"
                     placeholder="Type your markdown here..."
                     spellCheck="false"
                   />
                 </div>
                 <div 
-  className="h-[calc(100vh-400px)] overflow-auto p-4 rounded-lg bg-gray-900/60 border border-gray-800/50 prose prose-invert prose-sm max-w-none"
-  dangerouslySetInnerHTML={{ __html: renderedContent }}
-/>
+                  className="markdown-preview h-[calc(100vh-400px)] overflow-auto p-4 rounded-lg bg-gray-900/60 border border-gray-800/50 text-gray-300"
+                  dangerouslySetInnerHTML={{ __html: renderedContent }}
+                />
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
+
+      <style jsx global>{`
+        .markdown-preview {
+          line-height: 1.6;
+        }
+        .markdown-preview h1 {
+          font-size: 2em;
+          margin: 0.67em 0;
+          color: #fff;
+        }
+        .markdown-preview h2 {
+          font-size: 1.5em;
+          margin: 0.83em 0;
+          color: #fff;
+        }
+        .markdown-preview h3 {
+          font-size: 1.17em;
+          margin: 1em 0;
+          color: #fff;
+        }
+        .markdown-preview strong {
+          font-weight: bold;
+          color: #fff;
+        }
+        .markdown-preview em {
+          font-style: italic;
+        }
+        .markdown-preview code {
+          background-color: rgba(255, 255, 255, 0.1);
+          padding: 0.2em 0.4em;
+          border-radius: 3px;
+          font-family: monospace;
+        }
+        .markdown-preview pre {
+          background-color: rgba(255, 255, 255, 0.1);
+          padding: 1em;
+          border-radius: 6px;
+          overflow-x: auto;
+        }
+        .markdown-preview pre code {
+          background-color: transparent;
+          padding: 0;
+          border-radius: 0;
+          color: #e2e8f0;
+        }
+        .markdown-preview blockquote {
+          border-left: 4px solid #ed8936;
+          margin: 1em 0;
+          padding-left: 1em;
+          color: #a0aec0;
+        }
+        .markdown-preview ul, .markdown-preview ol {
+          margin: 1em 0;
+          padding-left: 2em;
+          list-style-position: outside;
+        }
+        .markdown-preview ul {
+          list-style-type: disc;
+        }
+        .markdown-preview ul ul {
+          list-style-type: circle;
+        }
+        .markdown-preview ul ul ul {
+          list-style-type: square;
+        }
+        .markdown-preview ol {
+          list-style-type: decimal;
+        }
+        .markdown-preview ol ol {
+          list-style-type: lower-alpha;
+        }
+        .markdown-preview ol ol ol {
+          list-style-type: lower-roman;
+        }
+        .markdown-preview li {
+          margin: 0.5em 0;
+          display: list-item;
+        }
+        .markdown-preview ul ul, 
+        .markdown-preview ul ol, 
+        .markdown-preview ol ul, 
+        .markdown-preview ol ol {
+          margin: 0.5em 0 0.5em 2em;
+        }
+        .markdown-preview a {
+          color: #ed8936;
+          text-decoration: none;
+        }
+        .markdown-preview a:hover {
+          text-decoration: underline;
+        }
+        .markdown-preview p {
+          margin: 1em 0;
+        }
+        .markdown-preview img {
+          max-width: 100%;
+          height: auto;
+          border-radius: 6px;
+        }
+      `}</style>
     </div>
   );
 };
