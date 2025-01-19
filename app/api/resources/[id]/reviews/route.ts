@@ -1,18 +1,21 @@
 import { createServerClien } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
-// @ts-expect-error - Next.js API route type mismatch
-export async function GET(
-  request: NextRequest,
-  context: { params: { id: string } }
-): Promise<NextResponse> {
+interface Params {
+  params: { id: string };
+}
+
+export const GET = async (
+  _req: NextRequest,
+  { params }: Params
+) => {
   try {
     const supabase = createServerClien();
     
     const { data, error } = await supabase
       .from('resource_reviews')
       .select('*')
-      .eq('resource_id', context.params.id)
+      .eq('resource_id', params.id)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -24,11 +27,10 @@ export async function GET(
   }
 }
 
-// @ts-expect-error - Next.js API route type mismatch
-export async function POST(
+export const POST = async (
   request: NextRequest,
-  context: { params: { id: string } }
-): Promise<NextResponse> {
+  { params }: Params
+) => {
   try {
     const body = await request.json();
     const supabase = createServerClien();
@@ -37,7 +39,7 @@ export async function POST(
       .from('resource_reviews')
       .insert([{
         ...body,
-        resource_id: context.params.id
+        resource_id: params.id
       }])
       .select()
       .single();
