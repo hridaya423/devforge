@@ -1,23 +1,17 @@
 import { createServerClien } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
-type RouteContext = {
-  params: {
-    id: string;
-  }
-}
-
 export async function GET(
   request: NextRequest,
-  context: RouteContext
-) {
+  { params }: { params: { id: string }}
+): Promise<NextResponse> {
   try {
     const supabase = createServerClien();
     
     const { data, error } = await supabase
       .from('resource_reviews')
       .select('*')
-      .eq('resource_id', context.params.id)
+      .eq('resource_id', params.id)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -31,8 +25,8 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  context: RouteContext
-) {
+  { params }: { params: { id: string }}
+): Promise<NextResponse> {
   try {
     const body = await request.json();
     const supabase = createServerClien();
@@ -41,7 +35,7 @@ export async function POST(
       .from('resource_reviews')
       .insert([{
         ...body,
-        resource_id: context.params.id
+        resource_id: params.id
       }])
       .select()
       .single();
