@@ -8,6 +8,12 @@ import {
   ColorNames
 } from '@/types/color';
 
+type NodeCanvasImageData = {
+  data: Uint8ClampedArray;
+  width: number;
+  height: number;
+};
+
 export class ColorAnalyzer {
   private static readonly DEFAULT_OPTIONS = {
     maxColors: 5,
@@ -21,7 +27,7 @@ export class ColorAnalyzer {
       .join('');
   }
 
-  private static async setupCanvas(buffer: Buffer): Promise<[Canvas, ImageData]> {
+  private static async setupCanvas(buffer: Buffer): Promise<[Canvas, NodeCanvasImageData]> {
     const image = await loadImage(buffer);
     const canvas = createCanvas(image.width, image.height);
     const ctx = canvas.getContext('2d');
@@ -37,7 +43,6 @@ export class ColorAnalyzer {
     }
     return pixels;
   }
-
   private static quantizeColors(pixels: number[][], maxColors: number): number[][] {
     let centroids = pixels.slice(0, maxColors);
     const iterations = this.DEFAULT_OPTIONS.maxIterations;
