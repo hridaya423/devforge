@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import EditProfileClient from '@/components/tools/socialbio/editprofile';
 
-export default function EditProfilePage({
+export default async function EditProfilePage({
   params
 }: {
   params: { username: string }
