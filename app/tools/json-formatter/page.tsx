@@ -1,8 +1,12 @@
 import type { Metadata } from 'next';
-import JsonFormatter from '@/components/tools/jsonformatter';
+import dynamic from 'next/dynamic';
+const JsonFormatter = dynamic(
+  () => import('@/components/tools/jsonformatter'),
+  { ssr: false }
+);
 
 export const metadata: Metadata = {
-  title: 'JSON Formatter & Validator | DevForge',
+  title: 'JSON Toolkit | DevForge',
   description: 'Format, validate, and beautify your JSON data with ease',
 };
 
