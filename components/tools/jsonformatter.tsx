@@ -28,6 +28,28 @@ const JsonFormatter = () => {
   const [secondInput, setSecondInput] = useState('');
   const [jsonPath, setJsonPath] = useState('$..');
   const [schema, setSchema] = useState('');
+  const isBrowser = typeof window !== 'undefined';
+  
+  useEffect(() => {
+    if (!isBrowser) return;
+    
+    const savedState = localStorage.getItem('jsonFormatterState');
+    if (savedState) {
+      const { input, schema, jsonPath, theme } = JSON.parse(savedState);
+      setInput(input || '');
+      setSchema(schema || '');
+      setJsonPath(jsonPath || '$..');
+      setTheme(theme || 'light');
+    }
+  }, [isBrowser]);
+
+  useEffect(() => {
+    if (!isBrowser) return;
+    
+    const state = { input, schema, jsonPath, theme };
+    localStorage.setItem('jsonFormatterState', JSON.stringify(state));
+  }, [input, schema, jsonPath, theme, isBrowser]);
+  
   useEffect(() => {
     const savedState = localStorage.getItem('jsonFormatterState');
     if (savedState) {
