@@ -137,20 +137,6 @@ const LandingPage: React.FC = () => {
       category: "Design"
     },
     {
-      title: "Dev Resource Rater",
-      description: "Rate and review development tools with code examples",
-      icon: Star,
-      path: "/tools/resource-rater",
-      category: "Development"
-    },
-    {
-      title: "Code Snippet Battle",
-      description: "Submit and vote on coding challenge solutions",
-      icon: Code,
-      path: "/tools/snippet-battle",
-      category: "Development"
-    },
-    {
       title: "PR Quality Scorer",
       description: "Analyze and score GitHub pull requests",
       icon: GitPullRequest,
@@ -219,13 +205,6 @@ const LandingPage: React.FC = () => {
       icon: Search,
       path: "/tools/seo-analyzer",
       category: "SEO"
-    },
-    {
-      title: "Social Bio Hub",
-      description: "Create a beautiful unified page for all your social profiles",
-      icon: Share2,
-      path: "/tools/social-bio",
-      category: "Social"
     },
   ];
 
