@@ -52,7 +52,7 @@
     "next": "15.1.4",
     "node-html-parser": "^7.0.1",
     "ntc": "^0.0.1",
-    "prismjs": "^1.29.0",
+    "prismjs": "^1.30.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hotkeys-hook": "^4.6.1",
