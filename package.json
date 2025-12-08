@@ -43,7 +43,7 @@
     "file-saver": "^2.0.5",
     "framer-motion": "^11.18.1",
     "isomorphic-dompurify": "^2.20.0",
-    "js-yaml": "^4.1.0",
+    "js-yaml": "^4.1.1",
     "jsonpath": "^1.1.1",
     "keyword-extractor": "^0.0.28",
     "lodash": "^4.17.21",
