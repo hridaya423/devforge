@@ -34,7 +34,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "colorthief": "^2.6.0",
-    "cron": "^3.5.0",
+    "cron": "^4.3.5",
     "cron-parser": "^4.9.0",
     "cron-validator": "^1.4.0",
     "diff": "^7.0.0",
