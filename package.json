@@ -21,7 +21,7 @@
     "@radix-ui/react-switch": "^1.1.2",
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-toast": "^1.2.15",
-    "@react-spring/web": "^9.7.5",
+    "@react-spring/web": "^10.0.3",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.47.16",
     "@types/lodash": "^4.17.14",
