@@ -49,7 +49,7 @@
     "lodash": "^4.17.21",
     "lucide-react": "^0.562.0",
     "marked": "^17.0.1",
-    "next": "16.1.0",
+    "next": "16.1.1",
     "node-html-parser": "^7.0.1",
     "ntc": "^0.0.1",
     "prismjs": "^1.30.0",
