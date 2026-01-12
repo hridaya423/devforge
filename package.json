@@ -41,7 +41,7 @@
     "dompurify": "^3.2.3",
     "express-rate-limit": "^8.2.1",
     "file-saver": "^2.0.5",
-    "framer-motion": "^12.23.26",
+    "framer-motion": "^12.25.0",
     "isomorphic-dompurify": "^2.35.0",
     "js-yaml": "^4.1.0",
     "jsonpath": "^1.1.1",
