@@ -42,7 +42,7 @@
     "express-rate-limit": "^8.2.1",
     "file-saver": "^2.0.5",
     "framer-motion": "^12.33.0",
-    "isomorphic-dompurify": "^2.35.0",
+    "isomorphic-dompurify": "^2.36.0",
     "js-yaml": "^4.1.0",
     "jsonpath": "^1.2.1",
     "keyword-extractor": "^0.0.28",
