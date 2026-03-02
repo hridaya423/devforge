@@ -48,7 +48,7 @@
     "keyword-extractor": "^0.0.28",
     "lodash": "^4.17.23",
     "lucide-react": "^0.575.0",
-    "marked": "^17.0.2",
+    "marked": "^17.0.3",
     "next": "16.1.6",
     "node-html-parser": "^7.0.2",
     "ntc": "^0.0.1",
